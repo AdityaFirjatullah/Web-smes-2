@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EL HITUNGAN - Aljabar</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(180deg, #b0bec5 0%, #90a4ae 100%);
+            padding: 20px 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            padding: 0 20px 30px;
+            color: #4dd0e1;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .logo::before {
+            content: "📊";
+            margin-right: 10px;
+            font-size: 24px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+            border-left-color: #4dd0e1;
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: #4dd0e1;
+            border-left-color: #00bcd4;
+        }
+
+        .nav-item::before {
+            margin-right: 15px;
+            font-size: 20px;
+        }
+
+        .nav-item:nth-child(2)::before { content: "👤"; }
+        .nav-item:nth-child(3)::before { content: "📊"; }
+        .nav-item:nth-child(4)::before { content: "🔢"; }
+
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .page-title {
+            text-align: center;
+            color: #00695c;
+            font-size: 36px;
+            margin-bottom: 40px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            animation: glowTitle 3s ease-in-out infinite alternate;
+        }
+
+        @keyframes glowTitle {
+            from {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1), 0 0 20px rgba(77, 208, 225, 0.3);
+            }
+            to {
+                text-shadow: 0 2px 4px rgba(0,0,0,0.1), 0 0 30px rgba(77, 208, 225, 0.6);
+            }
+        }
+
+        .cipher-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            animation: slideIn 1s ease-out;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .cipher-section {
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+            border-radius: 25px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .cipher-section::before {
+            content: '';
+            position: absolute;
+            top: -100%;
+            left: -100%;
+            width: 300%;
+            height: 300%;
+            background: conic-gradient(from 0deg, transparent, rgba(77, 208, 225, 0.1), transparent);
+            animation: rotate 8s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .cipher-section:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.15);
+        }
+
+        .section-header {
+            background: linear-gradient(145deg, #4dd0e1, #26c6da);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+            box-shadow: 0 8px 20px rgba(77, 208, 225, 0.3);
+        }
+
+        .section-header h2 {
+            font-size: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .section-header h2::before {
+            margin-right: 15px;
+            font-size: 28px;
+        }
+
+        .encrypt-section .section-header h2::before { content: "🔐"; }
+        .decrypt-section .section-header h2::before { content: "🔓"; }
+
+        .section-header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #00695c;
+            font-size: 16px;
+        }
+
+        .input-group textarea {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            resize: vertical;
+            min-height: 120px;
+            transition: all 0.3s ease;
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .input-group textarea:focus {
+            outline: none;
+            border-color: #4dd0e1;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.05), 0 0 0 3px rgba(77, 208, 225, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .input-group input[type="number"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            background: linear-gradient(145deg, #ffffff, #f8f9fa);
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .input-group input[type="number"]:focus {
+            outline: none;
+            border-color: #4dd0e1;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.05), 0 0 0 3px rgba(77, 208, 225, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .cipher-button {
+            width: 100%;
+            background: linear-gradient(145deg, #ff6b6b, #ff5252);
+            color: white;
+            border: none;
+            padding: 18px 30px;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
+            position: relative;
+            z-index: 2;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        .cipher-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            transform: translate(-50%, -50%);
+        }
+
+        .cipher-button:hover::before {
+            width: 400px;
+            height: 400px;
+        }
+
+        .cipher-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(255, 107, 107, 0.4);
+        }
+
+        .cipher-button:active {
+            transform: translateY(-1px);
+        }
+
+        .result-box {
+            padding: 20px;
+            background: linear-gradient(145deg, #e8f5e8, #f1f8e9);
+            border-radius: 15px;
+            border-left: 5px solid #4caf50;
+            position: relative;
+            z-index: 2;
+            min-height: 100px;
+            transition: all 0.3s ease;
+        }
+
+        .result-box:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.2);
+        }
+
+        .result-box h3 {
+            color: #2e7d32;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+
+        .result-box p {
+            color: #388e3c;
+            font-size: 16px;
+            line-height: 1.5;
+            word-break: break-all;
+        }
+
+        .info-section {
+            grid-column: 1 / -1;
+            background: linear-gradient(145deg, #4dd0e1, #26c6da);
+            color: white;
+            padding: 30px;
+            border-radius: 25px;
+            margin-top: 20px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 15px 35px rgba(77, 208, 225, 0.3);
+        }
+
+        .info-section::before {
+            content: '';
+            position: absolute;
+            top: -50px;
+            right: -50px;
+            width: 100px;
+            height: 100px;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            border-radius: 50%;
+            animation: float 4s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(180deg); }
+        }
+
+        .info-section h2 {
+            font-size: 28px;
+            margin-bottom: 20px;
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+
+        .info-section h2::before {
+            content: "📚";
+            margin-right: 15px;
+            font-size: 32px;
+        }
+
+        .info-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .info-card {
+            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .info-card:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-5px);
+        }
+
+        .info-card h3 {
+            font-size: 20px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+
+        .info-card h3::before {
+            margin-right: 10px;
+            font-size: 24px;
+        }
+
+        .info-card:nth-child(1) h3::before { content: "🔄"; }
+        .info-card:nth-child(2) h3::before { content: "🛡️"; }
+
+        .info-card p {
+            line-height: 1.6;
+            font-size: 14px;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                display: flex;
+                overflow-x: auto;
+                padding: 10px 0;
+            }
+            
+            .nav-item {
+                white-space: nowrap;
+                min-width: 120px;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+            
+            .cipher-container {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .info-content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="logo">EL HITUNGAN</div>
+        <a href="profil.html" class="nav-item">Profil</a>
+        <a href="statistik.html" class="nav-item">Statistik</a>
+        <a href="aljabar.html" class="nav-item active">Aljabar</a>
+    </nav>
+
+    <main class="main-content">
+        <h1 class="page-title">Caesar Cipher Tool</h1>
+        
+        <div class="cipher-container">
+            <!-- Enkripsi Section -->
+            <div class="cipher-section encrypt-section">
+                <div class="section-header">
+                    <h2>Enkripsi</h2>
+                    <p>Mengubah teks biasa menjadi teks tersandi</p>
+                </div>
+                
+                <div class="input-group">
+                    <label for="plaintext">Teks yang akan dienkripsi:</label>
+                    <textarea id="plaintext" placeholder="Masukkan teks yang ingin dienkripsi..."></textarea>
+                </div>
+                
+                <div class="input-group">
+                    <label for="encryptShift">Kunci Pergeseran (1-25):</label>
+                    <input type="number" id="encryptShift" min="1" max="25" value="3" placeholder="Masukkan kunci">
+                </div>
+                
+                <button class="cipher-button" onclick="encryptText()">
+                    🔐 Enkripsi Teks
+                </button>
+                
+                <div id="encryptResult" class="result-box">
+                    <h3>Hasil Enkripsi:</h3>
+                    <p>Hasil enkripsi akan muncul di sini...</p>
+                </div>
+            </div>
+
+            <!-- Dekripsi Section -->
+            <div class="cipher-section decrypt-section">
+                <div class="section-header">
+                    <h2>Dekripsi</h2>
+                    <p>Mengubah teks tersandi kembali ke teks biasa</p>
+                </div>
+                
+                <div class="input-group">
+                    <label for="ciphertext">Teks yang akan didekripsi:</label>
+                    <textarea id="ciphertext" placeholder="Masukkan teks yang ingin didekripsi..."></textarea>
+                </div>
+                
+                <div class="input-group">
+                    <label for="decryptShift">Kunci Pergeseran (1-25):</label>
+                    <input type="number" id="decryptShift" min="1" max="25" value="3" placeholder="Masukkan kunci">
+                </div>
+                
+                <button class="cipher-button" onclick="decryptText()">
+                    🔓 Dekripsi Teks
+                </button>
+                
+                <div id="decryptResult" class="result-box">
+                    <h3>Hasil Dekripsi:</h3>
+                    <p>Hasil dekripsi akan muncul di sini...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Info Section -->
+        <div class="info-section">
+            <h2>Tentang Caesar Cipher</h2>
+            <div class="info-content">
+                <div class="info-card">
+                    <h3>Cara Kerja</h3>
+                    <p>Caesar Cipher adalah metode enkripsi substitusi sederhana dimana setiap huruf dalam teks asli diganti dengan huruf lain yang berada pada posisi tetap di alfabetnya. Misalnya, dengan pergeseran 3, A menjadi D, B menjadi E, dan seterusnya.</p>
+                </div>
+                <div class="info-card">
+                    <h3>Keamanan</h3>
+                    <p>Meskipun mudah dipahami dan diimplementasikan, Caesar Cipher memiliki tingkat keamanan yang rendah karena hanya ada 25 kemungkinan kunci. Namun, ini adalah pengenalan yang baik untuk memahami konsep dasar kriptografi.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function caesarCipher(text, shift, decrypt = false) {
+            if (decrypt) shift = -shift;
+            
+            return text.split('').map(char => {
+                if (char.match(/[a-z]/i)) {
+                    const start = char.toLowerCase() === char ? 97 : 65;
+                    const code = char.charCodeAt(0);
+                    let shifted = ((code - start + shift + 26) % 26) + start;
+                    return String.fromCharCode(shifted);
+                }
+                return char;
+            }).join('');
+        }
+
+        function encryptText() {
+            const plaintext = document.getElementById('plaintext').value;
+            const shift = parseInt(document.getElementById('encryptShift').value);
+            const resultDiv = document.getElementById('encryptResult');
+
+            if (!plaintext.trim()) {
+                resultDiv.innerHTML = `
+                    <h3>⚠️ Peringatan:</h3>
+                    <p>Silakan masukkan teks yang ingin dienkripsi!</p>
+                `;
+                return;
+            }
+
+            if (isNaN(shift) || shift < 1 || shift > 25) {
+                resultDiv.innerHTML = `
+                    <h3>⚠️ Peringatan:</h3>
+                    <p>Kunci pergeseran harus berupa angka antara 1-25!</p>
+                `;
+                return;
+            }
+
+            const encrypted = caesarCipher(plaintext, shift);
+            
+            resultDiv.innerHTML = `
+                <h3>✅ Hasil Enkripsi:</h3>
+                <p><strong>Teks Asli:</strong> ${plaintext}</p>
+                <p><strong>Kunci:</strong> ${shift}</p>
+                <p><strong>Teks Terenkripsi:</strong> ${encrypted}</p>
+            `;
+
+            // Add animation effect
+            resultDiv.style.animation = 'none';
+            setTimeout(() => {
+                resultDiv.style.animation = 'pulse 1s ease-in-out';
+            }, 10);
+        }
+
+        function decryptText() {
+            const ciphertext = document.getElementById('ciphertext').value;
+            const shift = parseInt(document.getElementById('decryptShift').value);
+            const resultDiv = document.getElementById('decryptResult');
+
+            if (!ciphertext.trim()) {
+                resultDiv.innerHTML = `
+                    <h3>⚠️ Peringatan:</h3>
+                    <p>Silakan masukkan teks yang ingin didekripsi!</p>
+                `;
+                return;
+            }
+
+            if (isNaN(shift) || shift < 1 || shift > 25) {
+                resultDiv.innerHTML = `
+                    <h3>⚠️ Peringatan:</h3>
+                    <p>Kunci pergeseran harus berupa angka antara 1-25!</p>
+                `;
+                return;
+            }
+
+            const decrypted = caesarCipher(ciphertext, shift, true);
+            
+            resultDiv.innerHTML = `
+                <h3>✅ Hasil Dekripsi:</h3>
+                <p><strong>Teks Terenkripsi:</strong> ${ciphertext}</p>
+                <p><strong>Kunci:</strong> ${shift}</p>
+                <p><strong>Teks Asli:</strong> ${decrypted}</p>
+            `;
+
+            // Add animation effect
+            resultDiv.style.animation = 'none';
+            setTimeout(() => {
+                resultDiv.style.animation = 'pulse 1s ease-in-out';
+            }, 10);
+        }
+
+        // Add pulse animation keyframes
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.05); }
+                100% { transform: scale(1); }
+            }
+        `;
+        document.head.appendChild(style);
+
+        // Auto-sync results between encrypt and decrypt
+        function autoSync() {
+            const encryptResult = document.getElementById('encryptResult');
+            const decryptTextarea = document.getElementById('ciphertext');
+            const decryptShift = document.getElementById('decryptShift');
+            const encryptShift = document.getElementById('encryptShift');
+
+            // Sync shift values
+            encryptShift.addEventListener('input', () => {
+                decryptShift.value = encryptShift.value;
+            });
+
+            decryptShift.addEventListener('input', () => {
+                encryptShift.value = decryptShift.value;
+            });
+        }
+
+        // Initialize auto-sync
+        document.addEventListener('DOMContentLoaded', autoSync);
+
+        // Add enter key support
+        document.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                if (e.target.id === 'plaintext' || e.target.id === 'encryptShift') {
+                    e.preventDefault();
+                    encryptText();
+                } else if (e.target.id === 'ciphertext' || e.target.id === 'decryptShift') {
+                    e.preventDefault();
+                    decryptText();
+                }
+            }
+        });
+    </script>
+</body>
+</html>

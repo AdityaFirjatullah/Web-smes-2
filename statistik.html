@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EL HITUNGAN - Statistik</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+            min-height: 100vh;
+            display: flex;
+        }
+
+        .sidebar {
+            width: 250px;
+            background: linear-gradient(180deg, #b0bec5 0%, #90a4ae 100%);
+            padding: 20px 0;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            padding: 0 20px 30px;
+            color: #4dd0e1;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .logo::before {
+            content: "📊";
+            margin-right: 10px;
+            font-size: 24px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-left: 4px solid transparent;
+        }
+
+        .nav-item:hover {
+            background: rgba(255,255,255,0.1);
+            border-left-color: #4dd0e1;
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: #4dd0e1;
+            border-left-color: #00bcd4;
+        }
+
+        .nav-item::before {
+            margin-right: 15px;
+            font-size: 20px;
+        }
+
+        .nav-item:nth-child(2)::before { content: "👤"; }
+        .nav-item:nth-child(3)::before { content: "📊"; }
+        .nav-item:nth-child(4)::before { content: "🔢"; }
+
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .page-title {
+            text-align: center;
+            color: #00695c;
+            font-size: 36px;
+            margin-bottom: 40px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            animation: fadeInDown 1s ease-out;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .calculator-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: linear-gradient(145deg, #ffffff, #f5f5f5);
+            border-radius: 25px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            animation: fadeInUp 1s ease-out 0.3s both;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .calc-section {
+            margin-bottom: 40px;
+            padding: 30px;
+            background: linear-gradient(145deg, #4dd0e1, #26c6da);
+            border-radius: 20px;
+            color: white;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .calc-section::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 6s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .calc-section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(77, 208, 225, 0.3);
+        }
+
+        .calc-section h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+        }
+
+        .calc-section h2::before {
+            content: "🎲";
+            margin-right: 15px;
+            font-size: 28px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            font-size: 16px;
+            background: rgba(255,255,255,0.9);
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .input-group input:focus {
+            outline: none;
+            background: white;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+            transform: translateY(-2px);
+        }
+
+        .calc-button {
+            background: linear-gradient(145deg, #ff6b6b, #ff5252);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 20px rgba(255, 107, 107, 0.3);
+            position: relative;
+            z-index: 2;
+            overflow: hidden;
+        }
+
+        .calc-button::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255,255,255,0.2);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            transform: translate(-50%, -50%);
+        }
+
+        .calc-button:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .calc-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(255, 107, 107, 0.4);
+        }
+
+        .calc-button:active {
+            transform: translateY(-1px);
+        }
+
+        .result-box {
+            margin-top: 25px;
+            padding: 20px;
+            background: rgba(255,255,255,0.2);
+            border-radius: 15px;
+            border-left: 5px solid #fff;
+            position: relative;
+            z-index: 2;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { background: rgba(255,255,255,0.2); }
+            50% { background: rgba(255,255,255,0.3); }
+        }
+
+        .result-box h3 {
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .result-box p {
+            font-size: 16px;
+            line-height: 1.5;
+        }
+
+        .formula-explanation {
+            background: rgba(255,255,255,0.15);
+            padding: 20px;
+            border-radius: 15px;
+            margin-top: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .formula-explanation h4 {
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+
+        .formula-explanation p {
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 100%;
+                display: flex;
+                overflow-x: auto;
+                padding: 10px 0;
+            }
+            
+            .nav-item {
+                white-space: nowrap;
+                min-width: 120px;
+            }
+            
+            .main-content {
+                padding: 20px;
+            }
+            
+            .calculator-container {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="sidebar">
+        <div class="logo">EL HITUNGAN</div>
+        <a href="profil.html" class="nav-item">Profil</a>
+        <a href="statistik.html" class="nav-item active">Statistik</a>
+        <a href="aljabar.html" class="nav-item">Aljabar</a>
+    </nav>
+
+    <main class="main-content">
+        <h1 class="page-title">Kalkulator Probabilitas</h1>
+        
+        <div class="calculator-container">
+            <!-- Probabilitas Sederhana -->
+            <div class="calc-section">
+                <h2>Probabilitas Sederhana</h2>
+                <div class="input-group">
+                    <label for="favorable">Jumlah Kejadian yang Diinginkan:</label>
+                    <input type="number" id="favorable" min="0" placeholder="Masukkan jumlah kejadian yang diinginkan">
+                </div>
+                <div class="input-group">
+                    <label for="total">Total Kemungkinan Kejadian:</label>
+                    <input type="number" id="total" min="1" placeholder="Masukkan total kemungkinan kejadian">
+                </div>
+                <button class="calc-button" onclick="calculateSimpleProbability()">Hitung Probabilitas</button>
+                <div id="simpleResult" class="result-box">
+                    <p>Masukkan nilai untuk menghitung probabilitas</p>
+                </div>
+                <div class="formula-explanation">
+                    <h4>Rumus: P(A) = n(A) / n(S)</h4>
+                    <p>Dimana P(A) adalah probabilitas kejadian A, n(A) adalah jumlah kejadian yang diinginkan, dan n(S) adalah total kemungkinan kejadian.</p>
+                </div>
+            </div>
+
+            <!-- Probabilitas Gabungan -->
+            <div class="calc-section">
+                <h2>Probabilitas Gabungan (AND)</h2>
+                <div class="input-group">
+                    <label for="prob1">Probabilitas Kejadian A (0-1):</label>
+                    <input type="number" id="prob1" min="0" max="1" step="0.01" placeholder="Masukkan probabilitas A">
+                </div>
+                <div class="input-group">
+                    <label for="prob2">Probabilitas Kejadian B (0-1):</label>
+                    <input type="number" id="prob2" min="0" max="1" step="0.01" placeholder="Masukkan probabilitas B">
+                </div>
+                <button class="calc-button" onclick="calculateJointProbability()">Hitung Probabilitas Gabungan</button>
+                <div id="jointResult" class="result-box">
+                    <p>Masukkan nilai untuk menghitung probabilitas gabungan</p>
+                </div>
+                <div class="formula-explanation">
+                    <h4>Rumus: P(A ∩ B) = P(A) × P(B)</h4>
+                    <p>Untuk kejadian independen, probabilitas keduanya terjadi adalah perkalian dari masing-masing probabilitas.</p>
+                </div>
+            </div>
+
+            <!-- Probabilitas Union -->
+            <div class="calc-section">
+                <h2>Probabilitas Union (OR)</h2>
+                <div class="input-group">
+                    <label for="probA">Probabilitas Kejadian A (0-1):</label>
+                    <input type="number" id="probA" min="0" max="1" step="0.01" placeholder="Masukkan probabilitas A">
+                </div>
+                <div class="input-group">
+                    <label for="probB">Probabilitas Kejadian B (0-1):</label>
+                    <input type="number" id="probB" min="0" max="1" step="0.01" placeholder="Masukkan probabilitas B">
+                </div>
+                <div class="input-group">
+                    <label for="probAB">Probabilitas A dan B (0-1):</label>
+                    <input type="number" id="probAB" min="0" max="1" step="0.01" placeholder="Masukkan probabilitas A dan B">
+                </div>
+                <button class="calc-button" onclick="calculateUnionProbability()">Hitung Probabilitas Union</button>
+                <div id="unionResult" class="result-box">
+                    <p>Masukkan nilai untuk menghitung probabilitas union</p>
+                </div>
+                <div class="formula-explanation">
+                    <h4>Rumus: P(A ∪ B) = P(A) + P(B) - P(A ∩ B)</h4>
+                    <p>Probabilitas A atau B terjadi adalah jumlah probabilitas masing-masing dikurangi probabilitas keduanya terjadi.</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        function calculateSimpleProbability() {
+            const favorable = parseFloat(document.getElementById('favorable').value);
+            const total = parseFloat(document.getElementById('total').value);
+            const resultDiv = document.getElementById('simpleResult');
+
+            if (isNaN(favorable) || isNaN(total) || total <= 0) {
+                resultDiv.innerHTML = '<p style="color: #ffeb3b;">❌ Masukkan nilai yang valid!</p>';
+                return;
+            }
+
+            if (favorable > total) {
+                resultDiv.innerHTML = '<p style="color: #ffeb3b;">❌ Kejadian yang diinginkan tidak boleh lebih besar dari total kejadian!</p>';
+                return;
+            }
+
+            const probability = favorable / total;
+            const percentage = (probability * 100).toFixed(2);
+
+            resultDiv.innerHTML = `
+                <div>
+                    <h3>✨ Hasil Perhitungan:</h3>
+                    <p><strong>Probabilitas:</strong> ${probability.toFixed(4)} atau ${percentage}%</p>
+                    <p><strong>Penjelasan:</strong> Dari ${total} kemungkinan, ada ${favorable} kejadian yang diinginkan.</p>
+                </div>
+            `;
+        }
+
+        function calculateJointProbability() {
+            const prob1 = parseFloat(document.getElementById('prob1').value);
+            const prob2 = parseFloat(document.getElementById('prob2').value);
+            const resultDiv = document.getElementById('jointResult');
+
+            if (isNaN(prob1) || isNaN(prob2) || prob1 < 0 || prob1 > 1 || prob2 < 0 || prob2 > 1) {
+                resultDiv.innerHTML = '<p style="color: #ffeb3b;">❌ Masukkan probabilitas antara 0 dan 1!</p>';
+                return;
+            }
+
+            const jointProbability = prob1 * prob2;
+            const percentage = (jointProbability * 100).toFixed(2);
+
+            resultDiv.innerHTML = `
+                <div>
+                    <h3>✨ Hasil Perhitungan:</h3>
+                    <p><strong>Probabilitas Gabungan:</strong> ${jointProbability.toFixed(4)} atau ${percentage}%</p>
+                    <p><strong>Penjelasan:</strong> Probabilitas kedua kejadian terjadi bersamaan adalah ${percentage}%.</p>
+                </div>
+            `;
+        }
+
+        function calculateUnionProbability() {
+            const probA = parseFloat(document.getElementById('probA').value);
+            const probB = parseFloat(document.getElementById('probB').value);
+            const probAB = parseFloat(document.getElementById('probAB').value);
+            const resultDiv = document.getElementById('unionResult');
+
+            if (isNaN(probA) || isNaN(probB) || isNaN(probAB) || 
+                probA < 0 || probA > 1 || probB < 0 || probB > 1 || probAB < 0 || probAB > 1) {
+                resultDiv.innerHTML = '<p style="color: #ffeb3b;">❌ Masukkan probabilitas antara 0 dan 1!</p>';
+                return;
+            }
+
+            if (probAB > Math.min(probA, probB)) {
+                resultDiv.innerHTML = '<p style="color: #ffeb3b;">❌ P(A∩B) tidak boleh lebih besar dari P(A) atau P(B)!</p>';
+                return;
+            }
+
+            const unionProbability = probA + probB - probAB;
+            const percentage = (unionProbability * 100).toFixed(2);
+
+            if (unionProbability > 1) {
+                resultDiv.innerHTML = '<p style="color: #ffeb3b;">❌ Hasil tidak valid! Periksa kembali nilai input.</p>';
+                return;
+            }
+
+            resultDiv.innerHTML = `
+                <div>
+                    <h3>✨ Hasil Perhitungan:</h3>
+                    <p><strong>Probabilitas Union:</strong> ${unionProbability.toFixed(4)} atau ${percentage}%</p>
+                    <p><strong>Penjelasan:</strong> Probabilitas kejadian A atau B terjadi adalah ${percentage}%.</p>
+                </div>
+            `;
+        }
+
+        // Add enter key support for all inputs
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = document.querySelectorAll('input');
+            inputs.forEach(input => {
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        const section = e.target.closest('.calc-section');
+                        const button = section.querySelector('.calc-button');
+                        button.click();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>
